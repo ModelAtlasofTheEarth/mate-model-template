@@ -1,0 +1,26 @@
+on: 
+  push:
+    paths:
+      - 'website_material/**'
+
+jobs:
+  copy-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          respositories: "test-website"
+      - uses: lubu12/copy-files-to-repository@v1
+        env:
+          API_TOKEN_GITHUB: ${{ steps.app-token.outputs.token }}
+        with:
+          source-files: 'website_material/'
+          destination-username: ${{ github.repository_owner }}
+          destination-repository: 'test-website'
+          destination-branch: 'slug'
+          destination-directory: 'src/pages/models/slug'
+          commit-email: 'tim.white@sydney.edu.au'
