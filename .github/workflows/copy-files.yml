@@ -1,12 +1,18 @@
+# on: 
+#   push:
+#     branches:
+#       - 'main'
+#     paths:
+#       - 'website_material/**'
+name: Copy Files
 on: 
-  push:
-    branches:
-      - 'main'
-    paths:
-      - 'website_material/**'
-
+  issues:
+    types: 
+      - labeled
+      
 jobs:
   copy-files:
+    if: contains(github.event.label.name, 'published')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@v1
