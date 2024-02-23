@@ -1,4 +1,4 @@
-import yaml
+from ruamel.yaml import YAML
 
 def navigate_and_assign(source, path, value):
     """Navigate through a nested dictionary and assign a value to the specified path."""
@@ -32,6 +32,7 @@ def read_yaml_with_header(file_path):
     with open(file_path,'r') as file:
         data = file.read()
 
-    yaml_content = yaml.safe_load(data.strip('---\n'))
+    yaml = YAML()
+    yaml_content = yaml.load(data.strip('---\n'))
 
     return yaml_content

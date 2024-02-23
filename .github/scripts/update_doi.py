@@ -1,5 +1,6 @@
 import os
 import io
+import re
 import json
 from ruamel.yaml import YAML
 from github import Github, Auth
@@ -9,14 +10,13 @@ from json_utils import *
 
 # Environment variables
 token = os.environ.get("GITHUB_TOKEN")
-repo_owner = os.environ.get("REPO_OWNER")
 repo_name = os.environ.get("REPO_NAME")
-issue_number = os.environ.get("ISSUE_NUMBER")
+issue_number = int(os.environ.get("ISSUE_NUMBER"))
 
 # Get issue
 auth = Auth.Token(token)
 g = Github(auth=auth)
-repo = g.get_repo(f"{repo_owner}/{repo_name}")
+repo = g.get_repo(repo_name)
 issue = repo.get_issue(number = issue_number)
 
 # Parse issue
@@ -32,7 +32,7 @@ if response == "OK":
     
     # JSON
     json_file_path = "ro-crate-metadata.json"
-    key_path = "@graph../.doi"
+    key_path = "@graph../.identifier"
 
     json_data = create_or_update_json_entry(json_file_path, key_path, doi)
     metadata_out = json.dumps(json_data, indent=4)

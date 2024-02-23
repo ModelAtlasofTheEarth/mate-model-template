@@ -27,8 +27,7 @@ jobs:
       - name: update doi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO_OWNER: ${{ github.repository_owner }}
-          REPO_NAME: ${{ github.repository.name }}
+          REPO_NAME: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           SUCCESS=$(python3 .github/scripts/update_doi.py)
