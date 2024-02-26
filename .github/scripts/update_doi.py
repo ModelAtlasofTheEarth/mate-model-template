@@ -37,8 +37,9 @@ if response == "OK":
     json_data = create_or_update_json_entry(json_file_path, key_path, doi)
     metadata_out = json.dumps(json_data, indent=4)
 
+    file_content = repo.get_contents(json_file_path)
     commit_message = "Update ro-crate with DOI"
-    repo.update_file(json_file_path, commit_message, metadata_out)
+    repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
 
 
     # YAML
@@ -61,8 +62,10 @@ if response == "OK":
     yaml.dump(web_yaml_dict, stream)
     stream.write("---\n")
     yaml_content_with_frontmatter = stream.getvalue()
+
+    file_content = repo.get_contents(yaml_file_path)
     commit_message = "Update YAML file with DOI"
-    repo.update_file(yaml_file_path, commit_message, yaml_content_with_frontmatter)
+    repo.update_file(yaml_file_path, commit_message, yaml_content_with_frontmatter, file_content.sha)
 
     # Print True to indicate success so that files may be copied to website repo
     print(True)
