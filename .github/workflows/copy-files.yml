@@ -41,6 +41,15 @@ jobs:
     if: ${{ needs.update-doi.outputs.success == 'True' }}
     runs-on: ubuntu-latest
     steps:  
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -r .github/scripts/requirements.txt
+
       - name: create token for website repo
         uses: actions/create-github-app-token@v1
         id: app-token
@@ -55,7 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: 'website'
-          BRANCH_NAME: ${{ github.repository.name }}
+          BRANCH_NAME: ${{ github.event.repository.name }}
         run: |
           python3 .github/scripts/create_branch.py
 
@@ -68,6 +77,6 @@ jobs:
           source-files: 'website_material/'
           destination-username: ${{ github.repository_owner }}
           destination-repository: 'website'
-          destination-branch: ${{ github.repository.name }}
-          destination-directory: 'src/pages/models/${{ github.repository.name }}'
+          destination-branch: ${{ github.event.repository.name }}
+          destination-directory: 'src/pages/models/${{ github.event.repository.name }}'
           commit-email: 'sara.moronpolanco@sydney.edu.au'
