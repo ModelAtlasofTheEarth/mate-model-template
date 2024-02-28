@@ -9,7 +9,7 @@ source_repo_name = os.environ.get("SOURCE_REPO_NAME")
 source_path = os.environ.get("SOURCE_PATH")
 target_repo_owner = os.environ.get("TARGET_REPO_OWNER")
 target_repo_name = os.environ.get("TARGET_REPO_NAME")
-target_branch_name = os.environ.get("TARGET_BRANCH_NAME")
+target_branch_name = os.environ.get("TARGET_REPO_BRANCH")
 target_path = os.environ.get("TARGET_PATH")
 
 auth = Auth.Token(token)
