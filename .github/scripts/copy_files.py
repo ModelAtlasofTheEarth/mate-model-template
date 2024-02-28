@@ -25,16 +25,16 @@ def copy_files(contents, target_path):
         else:
             # Check if the file alread exists in the target repo
             try:
-                target_file = target_repo.get_contents(f"{target_path}/{content.name}")
+                target_file = target_repo.get_contents(f"{target_path}/{content.name}", ref=target_branch_name)
                 # File exists, compare contents
                 if content.sha != target_file.sha:
                     # Contents differ, update the file
                     source_file_content = base64.b64decode(source_repo.get_git_blob(content.sha).content)
-                    target_repo.update_file(f"{target_path}/{content.name}",f"Updating {content.name}", source_file_content, target_file.sha)
+                    target_repo.update_file(f"{target_path}/{content.name}",f"Updating {content.name}", source_file_content, target_file.sha, branch=target_branch_name)
             except:
                 # Copy file to target repository
                 source_file_content = base64.b64decode(source_repo.get_git_blob(content.sha).content)
-                target_repo.create_file(f"{target_path}/{content.name}", f"Copying {content.name}", source_file_content)
+                target_repo.create_file(f"{target_path}/{content.name}", f"Copying {content.name}", source_file_content, branch=target_branch_name)
 
 # Get contents of source directory
 source_contents = source_repo.get_contents(source_path)
