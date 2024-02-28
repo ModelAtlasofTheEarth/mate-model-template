@@ -70,13 +70,14 @@ jobs:
 
 
       - name: copy files to website repo
-        uses: lubu12/copy-files-to-repository@v1
         env:
-          API_TOKEN_GITHUB: ${{ steps.app-token.outputs.token }}
-        with:
-          source-files: 'website_material/'
-          destination-username: ${{ github.repository_owner }}
-          destination-repository: 'website'
-          destination-branch: ${{ github.event.repository.name }}
-          destination-directory: 'src/pages/models/${{ github.event.repository.name }}'
-          commit-email: 'sara.moronpolanco@sydney.edu.au'
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          SOURCE_REPO_OWNER: ${{ github.repository_owner }}
+          SOURCE_REPO_NAME: ${{ github.event.repository.name }}
+          SOURCE_PATH: 'website_material'
+          TARGET_REPO_OWNER: ${{ github.repository_owner }}
+          TARGET_REPO_NAME: 'website'
+          TARGET_REPO_BRANCH: ${{ github.event.repository.name }}
+          TARGET_PATH: 'src/pages/models/${{ github.event.repository.name }}'
+        run: |
+          python3 .github/scripts/copy_files.py
