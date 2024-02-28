@@ -81,3 +81,12 @@ jobs:
           TARGET_PATH: 'src/pages/models/${{ github.event.repository.name }}'
         run: |
           python3 .github/scripts/copy_files.py
+
+      - name: update submission issue
+        env:
+          GITHUB_TOKEN:  ${{ steps.app-token.outputs.token }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: 'Model_Submission'
+          SLUG: ${{ github.event.repository.name }}
+        run: |
+          python3 .github/scripts/update_labels.py
