@@ -1,3 +1,4 @@
+import os
 from github import Github, Auth
 
 # Environment variables
@@ -20,5 +21,5 @@ for issue in repo.get_issues():
             if slug == comment_slug:
                 issue.add_to_labels('published')
                 break
-            
+
         
