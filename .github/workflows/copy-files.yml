@@ -36,6 +36,21 @@ jobs:
           SUCCESS=$(python3 .github/scripts/update_doi.py)
           echo "success=${SUCCESS}" >> $GITHUB_OUTPUT
 
+      - name: Clean gitkeep files from repo
+        run: |
+          for line in $(git ls-files | grep './gitkeep'); do
+            EXTRA_FILES=$(git ls-files $(dirname "$line") | wc -l)
+            if [ $EXTRA_FILES -ne "1" ]; then
+              rm "$line"
+            fi
+          done
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Remove unnecessary .gitkeep
+
+
   copy-files:
     needs: update-doi
     if: ${{ needs.update-doi.outputs.success == 'True' }}
