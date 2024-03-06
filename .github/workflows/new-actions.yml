@@ -8,7 +8,7 @@ on:
 
 jobs:
     find-repos:
-        if: ${{ github.event.repository.is_template == 'True' }}
+        if: ${{ github.event.repository.is_template == 'true' }}
         runs-on: ubuntu-latest
         outputs:
             repos: ${{ steps.found-repos.outputs.repos }}
