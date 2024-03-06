@@ -39,6 +39,7 @@ jobs:
               run: |
                 REPOS=$(python3 .github/scripts/find_repos.py)
                 echo "repos=${REPOS}" >> $GITHUB_OUTPUT
+                echo $REPOS
 
     copy-PR:
         needs: find-repos
