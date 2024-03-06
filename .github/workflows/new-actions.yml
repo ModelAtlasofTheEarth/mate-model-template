@@ -8,7 +8,7 @@ on:
 
 jobs:
     find-repos:
-        if: ${{ github.event.repository.is_template == 'true' }}
+        if: ${{ github.event.repository.name == 'mate_model_template' }}
         runs-on: ubuntu-latest
         outputs:
             repos: ${{ steps.found-repos.outputs.repos }}
