@@ -46,7 +46,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                repo: ${{ needs.find-repos.outputs.repos }}
+                repo: ['sandiford_2021_detachment_1', 'mather-2023-kimberlite']
         steps:
             - name: Checkout
               uses: actions/checkout@v4
