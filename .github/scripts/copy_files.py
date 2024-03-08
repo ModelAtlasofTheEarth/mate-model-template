@@ -23,7 +23,7 @@ def copy_files(contents, target_path):
             # Get the contents of the directory and copy recursively
             copy_files(source_repo.get_contents(content.path), f"{target_path}/{content.name}")
         else:
-            # Check if the file alread exists in the target repo
+            # Check if the file already exists in the target repo
             try:
                 target_file = target_repo.get_contents(f"{target_path}/{content.name}", ref=target_branch_name)
                 # File exists, compare contents
