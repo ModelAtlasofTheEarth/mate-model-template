@@ -38,7 +38,7 @@ jobs:
                 ORG: ${{ github.repository_owner }}
               run: |
                 REPOS=$(python3 .github/scripts/find_repos.py)
-                echo "repos=$(jq -cn --argjson environments "$REPOS" '{repo: $environments}')" >> $GITHUB_OUTPUT
+                echo "repos=$(jq -cn --arg environments "$REPOS" '{repo: $environments}')" >> $GITHUB_OUTPUT
                 echo $REPOS
 
     copy-PR:
