@@ -91,6 +91,7 @@ jobs:
             - name: create pull request
               env:
                 GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+                REPO_OWNER: ${{ github.repository_owner }}
                 REPO_NAME: ${{ matrix.repo }}
                 PR_TITLE: "New scripts from template repo"
                 GITHUB_EVENT_PATH: ${{ github.event_path }}
