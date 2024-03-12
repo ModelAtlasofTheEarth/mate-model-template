@@ -21,4 +21,4 @@ for repo in org.get_repos():
         if repo_json['template_repository']['name'] == repo_name:
             repos.append(repo.name)
 
-print(" ".join(repos))
+print(repos)
