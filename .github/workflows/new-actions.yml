@@ -60,7 +60,7 @@ jobs:
             - name: Print GITHUB_SHA
               run: |
                 echo $GITHUB_SHA
-                echo ${{ github.event.commits[*] }}
+                echo ${{ github.event.commits }}[*]
 
             - name: create m@te token for repo
               uses: actions/create-github-app-token@v1
