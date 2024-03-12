@@ -58,7 +58,11 @@ jobs:
             - run: pip install -r .github/scripts/requirements.txt
 
             - name: Print GITHUB_SHA
-              run: echo $GITHUB_SHA
+              run: |
+                echo $GITHUB_SHA
+                echo ${{ github.event_name }}
+                echo ${{ github.event_path }}
+                echo ${{ github.event.id }}
 
             - name: create m@te token for repo
               uses: actions/create-github-app-token@v1
