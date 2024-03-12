@@ -11,7 +11,7 @@ jobs:
         if: ${{ github.event.repository.name == 'mate_model_template' }}
         runs-on: ubuntu-latest
         outputs:
-            repos: ${{ steps.found-repos.outputs.repos }}
+            repo: ${{ steps.found-repos.outputs.repos }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
                 ORG: ${{ github.repository_owner }}
               run: |
                 REPOS=$(python3 .github/scripts/find_repos.py)
-                echo "repos=${REPOS}" >> $GITHUB_OUTPUT
+                echo "::set-output name=repo::$REPOS"
                 echo $REPOS
 
     copy-PR:
@@ -46,7 +46,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                repo: ${{ needs.find-repos.outputs.repos }}
+                ${{fromJson(needs.find_repos.outputs.repos)}}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
