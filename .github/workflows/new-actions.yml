@@ -46,7 +46,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                repo: ['sandiford_2021_detachment_1', 'mather-2023-kimberlite', 'foo_1972_model']
+                repo: ['sandiford_2021_detachment_1', 'mather-2023-kimberlite']
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -88,13 +88,15 @@ jobs:
               run: |
                 python3 .github/scripts/copy_files.py
 
+            - name: Print GITHUB_SHA
+              run: echo $GITHUB_SHA
+
             - name: create pull request
               env:
                 GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
                 REPO_NAME: ${{ matrix.repo }}
                 PR_TITLE: "New scripts from template repo"
-                PR_BODY: ${{ github.event.commits }}
                 HEAD_BRANCH: 'template-update'
                 BASE_BRANCH: 'main'
               run: |
-                python3 .github/scripts/pull_request.py
+                python3 .github/scripts/pull_request.py                
