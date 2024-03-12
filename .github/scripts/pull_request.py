@@ -4,6 +4,7 @@ from github import Github, Auth
 
 # Environment variables
 token = os.environ.get("GITHUB_TOKEN")
+repo_owner = os.environ.get("REPO_OWNER")
 repo_name = os.environ.get("REPO_NAME")
 pr_title = os.environ.get("PR_TITLE")
 event_path = os.environ.get("GITHUB_EVENT_PATH")
@@ -26,7 +27,7 @@ def get_commit_messages(event_path):
 # Get repo
 auth = Auth.Token(token)
 g = Github(auth=auth)
-repo = g.get_repo(repo_name)
+repo = g.get_repo(f"{repo_owner}/{repo_name}")
 
 # Generate PR body from commit messages in event json data:
 pr_body = get_commit_messages(event_path)
