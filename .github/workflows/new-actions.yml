@@ -38,7 +38,7 @@ jobs:
                 ORG: ${{ github.repository_owner }}
               run: |
                 REPOS=$(python3 .github/scripts/find_repos.py)
-                echo "::set-output name=repo::$REPOS"
+                echo "::set-output name=repos::$REPOS"
                 echo $REPOS
 
     copy-PR:
@@ -46,7 +46,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                ${{fromJson(needs.find_repos.outputs.repos)}}
+                ${{ fromJson(needs.find-repos.outputs.repo) }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
