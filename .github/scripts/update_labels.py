@@ -19,7 +19,7 @@ for issue in repo.get_issues():
         if phrase in comment.body:
             comment_slug = comment.body.split('ModelAtlasofTheEarth/')[1] # get slug in issue comment
             if slug == comment_slug:
-                issue.add_to_labels('published')
+                issue.add_to_labels('model published')
                 break
 
         
