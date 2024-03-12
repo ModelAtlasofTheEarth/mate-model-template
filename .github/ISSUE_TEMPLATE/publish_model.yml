@@ -2,7 +2,7 @@
 name: Publish model
 description: Update model with doi and publish
 title: "Publish model"
-labels: ["published"]
+labels: ["model published"]
 
 body:
 
