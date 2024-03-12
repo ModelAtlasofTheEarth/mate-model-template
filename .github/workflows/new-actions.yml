@@ -57,11 +57,6 @@ jobs:
                 python-version: "3.10"
             - run: pip install -r .github/scripts/requirements.txt
 
-            - name: Print GITHUB_SHA
-              run: |
-                echo $GITHUB_SHA
-                echo ${{ github.event.commits }}[*]
-
             - name: create m@te token for repo
               uses: actions/create-github-app-token@v1
               id: app-token
@@ -98,6 +93,7 @@ jobs:
                 GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
                 REPO_NAME: ${{ matrix.repo }}
                 PR_TITLE: "New scripts from template repo"
+                GITHUB_EVENT_PATH: ${{ github.event_path }}
                 HEAD_BRANCH: 'template-update'
                 BASE_BRANCH: 'main'
               run: |
