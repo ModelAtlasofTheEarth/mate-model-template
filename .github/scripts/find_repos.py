@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 from github import Github, Auth
 
@@ -21,4 +22,4 @@ for repo in org.get_repos():
         if repo_json['template_repository']['name'] == repo_name:
             repos.append(repo.name)
 
-print(repos)
+print(json.dumps(repos))
