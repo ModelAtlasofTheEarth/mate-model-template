@@ -1,22 +1,37 @@
 import os
+import json
 from github import Github, Auth
 
 # Environment variables
 token = os.environ.get("GITHUB_TOKEN")
 repo_name = os.environ.get("REPO_NAME")
 pr_title = os.environ.get("PR_TITLE")
-# event_path = os.environ.get("PR_BODY")
+event_path = os.environ.get("GITHUB_EVENT_PATH")
 head_branch = os.environ.get("HEAD_BRANCH")
 base_branch = os.environ.get("BASE_BRANCH")
+
+def get_commit_messages(event_path):
+    with open(event_path) as f:
+        event_data = json.load(f)
+
+    # Extract commits from event data
+    commits = event_data['commits']
+
+    # Extract commit messages
+    commit_messages = '\n'.join(['- '+ commit['message'] for commit in commits])
+
+    return commit_messages
+
 
 # Get repo
 auth = Auth.Token(token)
 g = Github(auth=auth)
 repo = g.get_repo(repo_name)
 
-# PR body was a is passed in as a list of commits, change it into a string of commit messages
-# pr_body = '\n'.join(['- '+ commit.message for commit in pr_body])
-pr_body = "Temp"
+# Generate PR body from commit messages in event json data:
+pr_body = get_commit_messages(event_path)
+
+print(pr_body)
 
 # Existing PRs
 existing_prs = repo.get_pulls(state='open', sort='created', base='main')
