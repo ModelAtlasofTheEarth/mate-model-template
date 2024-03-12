@@ -32,8 +32,6 @@ repo = g.get_repo(f"{repo_owner}/{repo_name}")
 # Generate PR body from commit messages in event json data:
 pr_body = get_commit_messages(event_path)
 
-print(pr_body)
-
 # Existing PRs
 existing_prs = repo.get_pulls(state='open', sort='created', base='main')
 
