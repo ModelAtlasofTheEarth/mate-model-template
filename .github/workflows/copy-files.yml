@@ -6,7 +6,7 @@ on:
       
 jobs:
   update-doi:
-    if: contains(github.event.label.name, 'published')
+    if: contains(github.event.label.name, 'model published')
     runs-on: ubuntu-latest
     outputs:
       success: ${{ steps.update-doi.outputs.success }}
