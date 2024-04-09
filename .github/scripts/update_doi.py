@@ -71,6 +71,6 @@ if response == "OK":
     print(True)
 else:
     issue.create_comment(f"An error was encountered trying to access the DOI provided. Please check that it was entered correctly.\n{response}")
-    issue.remove_from_labels("published")
+    issue.remove_from_labels("model published")
     # Print False to indicate failure so that files are not copied to website repo
     print(False)
