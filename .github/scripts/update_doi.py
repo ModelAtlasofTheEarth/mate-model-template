@@ -4,7 +4,7 @@ import re
 import json
 from ruamel.yaml import YAML
 from github import Github, Auth
-from request_utils import check_uri
+from parse_utils import extract_doi_parts
 from yaml_utils import *
 from json_utils import *
 
@@ -26,17 +26,37 @@ data = dict(re.findall(regex, issue.body))
 doi = data["-> doi"].strip()
 
 # Verify doi is valid
-response = check_uri(doi)
-if response == "OK":
+# because we are usign reserved DOIs, they can't be verified usign http.
+# instead, test if the DOI is in a sensible form
+response = extract_doi_parts(doi)
+if response != "No valid DOI found in the input string.":
     # Insert DOI into metadata
-    
+
     # JSON
     json_file_path = "ro-crate-metadata.json"
-    key_path = "@graph../.identifier"
 
+    #add the DOI to the root entity
+    key_path = "@graph../.identifier"
     json_data = create_or_update_json_entry(json_file_path, key_path, doi)
     metadata_out = json.dumps(json_data, indent=4)
+    file_content = repo.get_contents(json_file_path)
+    commit_message = "Update ro-crate with DOI"
+    repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
 
+
+    #add the DOI to the model_inputs entity
+    key_path = "@graph.model_inputs.identifier"
+    json_data = create_or_update_json_entry(json_file_path, key_path, doi)
+    metadata_out = json.dumps(json_data, indent=4)
+    file_content = repo.get_contents(json_file_path)
+    commit_message = "Update ro-crate with DOI"
+    repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
+
+
+    #add the DOI to the model_outputs entity
+    key_path = "@graph.model_outputs.identifier"
+    json_data = create_or_update_json_entry(json_file_path, key_path, doi)
+    metadata_out = json.dumps(json_data, indent=4)
     file_content = repo.get_contents(json_file_path)
     commit_message = "Update ro-crate with DOI"
     repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
@@ -52,7 +72,9 @@ if response == "OK":
     web_yaml_dict = read_yaml_with_header(yaml_file_path)
 
     # Path to key to update
-    key_path = "dataset.doi"
+    #key_path = "dataset.doi"
+    #add doi to the top level only
+    key_path = "doi"
     # Update value
     navigate_and_assign(web_yaml_dict, key_path, doi)
 
