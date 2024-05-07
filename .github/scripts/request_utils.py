@@ -1,5 +1,6 @@
 import requests
 
+
 def check_uri(uri):
 
     """
