@@ -1,9 +1,9 @@
 name: Copy Files
-on: 
+on:
   issues:
-    types: 
+    types:
       - labeled
-      
+
 jobs:
   update-doi:
     if: contains(github.event.label.name, 'model published')
@@ -57,7 +57,7 @@ jobs:
     needs: update-doi
     if: ${{ needs.update-doi.outputs.success == 'True' }}
     runs-on: ubuntu-latest
-    steps:  
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -75,7 +75,7 @@ jobs:
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
-          repositories: 'website,Model_Submission'
+          repositories: 'website,model_submission'
 
       - name: create branch
         env:
@@ -104,7 +104,7 @@ jobs:
         env:
           GITHUB_TOKEN:  ${{ steps.app-token.outputs.token }}
           REPO_OWNER: ${{ github.repository_owner }}
-          REPO_NAME: 'Model_Submission'
+          REPO_NAME: 'model_submission'
           SLUG: ${{ github.event.repository.name }}
         run: |
           python3 .github/scripts/update_labels.py
