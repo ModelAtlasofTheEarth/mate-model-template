@@ -40,6 +40,7 @@ jobs:
 
       - name: Clean gitkeep files from repo
         run: |
+          git pull
           for line in $(git ls-files | grep './gitkeep'); do
             EXTRA_FILES=$(git ls-files $(dirname "$line") | wc -l)
             if [ $EXTRA_FILES -ne "1" ]; then
