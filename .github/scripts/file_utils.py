@@ -2,6 +2,7 @@ import json
 from ruamel.yaml import YAML
 import csv
 import os
+from io import StringIO
 
 def create_or_update_json_entry(file_path, keys_path, new_value):
     # Read the JSON file
@@ -100,4 +101,10 @@ def update_csv_content(file_path, field, value):
     if not field_exists:
         updated_rows.append([field, value])
 
-    return updated_rows
+    # Convert the updated rows back into a CSV-formatted string
+    updated_csv_content = StringIO()
+    writer = csv.writer(updated_csv_content)
+    writer.writerows(updated_rows)
+    updated_csv_string = updated_csv_content.getvalue()
+
+    return updated_csv_string
