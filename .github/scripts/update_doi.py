@@ -5,8 +5,7 @@ import json
 from ruamel.yaml import YAML
 from github import Github, Auth
 from parse_utils import extract_doi_parts
-from yaml_utils import *
-from json_utils import *
+from file_utils import *
 
 # Environment variables
 token = os.environ.get("GITHUB_TOKEN")
@@ -60,6 +59,16 @@ if response != "No valid DOI found in the input string.":
     file_content = repo.get_contents(json_file_path)
     commit_message = "Update ro-crate with DOI"
     repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
+
+    #need to copy into the website materials folder
+
+    #update CSV
+    csv_file_path = 'metadata_trail/nci_iso.csv'
+    field = 'DOI (NCI Internal Field)'
+    updated_csv_content = update_csv_content(csv_file_path, field, doi)
+    file_content = repo.get_contents(csv_file_path)
+    commit_message = "Update nci_iso.csv with DOI"
+    repo.update_file(csv_file_path, commit_message, updated_csv_content, file_content.sha)
 
 
     # YAML
