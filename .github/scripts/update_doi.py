@@ -61,6 +61,10 @@ if response != "No valid DOI found in the input string.":
     repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
 
     #need to copy into the website materials folder
+    web_json_file_path = "website_material/ro-crate-metadata.json"
+    file_content = repo.get_contents(web_json_file_path)
+    commit_message = "Update Website ro-crate with DOI"
+    repo.update_file(web_json_file_path, commit_message, metadata_out, file_content.sha)
 
     #update CSV
     csv_file_path = 'metadata_trail/nci_iso.csv'
