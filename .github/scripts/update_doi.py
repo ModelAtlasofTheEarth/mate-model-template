@@ -4,7 +4,7 @@ import re
 import json
 from ruamel.yaml import YAML
 from github import Github, Auth
-from parse_utils import extract_doi_parts
+from parse_utils import *
 from file_utils import *
 
 # Environment variables
@@ -35,8 +35,20 @@ if response != "No valid DOI found in the input string.":
     json_file_path = "ro-crate-metadata.json"
 
     #add the DOI to the root entity
+    #Note: these function shouldn't take strings as arguments,
+    #as it necessiates multiple reloading.
     key_path = "@graph../.identifier"
     json_data = create_or_update_json_entry(json_file_path, key_path, doi)
+    metadata_out = json.dumps(json_data, indent=4)
+    file_content = repo.get_contents(json_file_path)
+    commit_message = "Update ro-crate with DOI"
+    repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
+
+    #add the creditText
+    #json_data should be the updatated rocrate dictionary
+    citation_str = format_citation(json_data)
+    key_path = "@graph../.creditText"
+    json_data = create_or_update_json_entry(json_file_path, key_path, citation_str)
     metadata_out = json.dumps(json_data, indent=4)
     file_content = repo.get_contents(json_file_path)
     commit_message = "Update ro-crate with DOI"
@@ -74,7 +86,6 @@ if response != "No valid DOI found in the input string.":
     commit_message = "Update nci_iso.csv with DOI"
     repo.update_file(csv_file_path, commit_message, updated_csv_content, file_content.sha)
 
-
     # YAML
     yaml = YAML(typ=['rt', 'string'])
     yaml.preserve_quotes = True
@@ -90,6 +101,9 @@ if response != "No valid DOI found in the input string.":
     key_path = "doi"
     # Update value
     navigate_and_assign(web_yaml_dict, key_path, doi)
+    key_path = "creditText"
+    # Update value
+    navigate_and_assign(web_yaml_dict, key_path, citation_str)
 
     # Use an in-memory text stream to hold the YAML content
     stream = io.StringIO()
