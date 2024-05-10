@@ -4,49 +4,59 @@ import csv
 import os
 from io import StringIO
 
-def create_or_update_json_entry(file_path, keys_path, new_value):
-    # Read the JSON file
-    with open(file_path, 'r') as file:
-        data = json.load(file)
+def create_or_update_json_entry(rocrate, keys_path, new_value):
+    """
+    Create or update a nested JSON entry in a ro-crate structure.
 
-    # Traverse the nested structure using the keys path
+    Args:
+        rocrate (dict): The main ro-crate dictionary.
+        keys_path (str): Dot-separated path to the key that needs updating.
+        new_value (any): New value to be inserted or updated.
+    """
+    # Split the keys path into individual components
     keys = keys_path.split('.')
     prefix = ""
-    current_data = data
+    structure = rocrate
 
+    # Traverse through the nested structure using keys except the last one
     for key in keys[:-1]:
-        # Hack to deal with potential of key being "./"
         key = prefix + key
+
+        # Handle potential './' prefix logic
         if key == "":
             prefix = "."
             continue
         else:
             prefix = ""
 
-        if type(current_data) == list:
-            # Find the item with @id as the key
-            for item in current_data:
+        if isinstance(structure, list):
+            # Find the item with matching '@id' key
+            for item in structure:
                 if item.get("@id") == key:
-                    current_data = item
-        elif key in current_data:
-            current_data = current_data[key]
+                    structure = item
+                    break
+            else:
+                print(f"Key '{key}' not found.")
+                return
+        elif key in structure:
+            structure = structure[key]
         else:
             print(f"Key '{key}' not found.")
-            return None
+            return
 
-    # Update value of the entry
+    # The final key where the new value should be placed
     last_key = keys[-1]
-    if last_key in current_data:
-        if isinstance(current_data[last_key], list):
-            current_data[last_key].insert(0, new_value)
+
+    # Update the value at the final key
+    if last_key in structure:
+        if isinstance(structure[last_key], list):
+            structure[last_key].insert(0, new_value)
         else:
-            current_data[last_key] = [new_value, current_data[last_key]]
+            structure[last_key] = [new_value, structure[last_key]]
     else:
-        current_data[last_key] = [new_value]
+        structure[last_key] = [new_value]
 
-    return data
 
-from ruamel.yaml import YAML
 
 def navigate_and_assign(source, path, value):
     """Navigate through a nested dictionary and assign a value to the specified path."""

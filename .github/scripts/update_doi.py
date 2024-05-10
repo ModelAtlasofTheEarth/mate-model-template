@@ -34,25 +34,37 @@ if response != "No valid DOI found in the input string.":
     # JSON
     json_file_path = "ro-crate-metadata.json"
 
-    #add the DOI to the root entity
-    #Note: these function shouldn't take strings as arguments,
-    #as it necessiates multiple reloading.
+    # Read the JSON file
+    with open(file_path, 'r') as file:
+            rocrate = json.load(json_file_path)
+
+    #add the DOI and any other chanages to the to the ro-crate
+
     key_path = "@graph../.identifier"
-    json_data = create_or_update_json_entry(json_file_path, key_path, doi)
-    metadata_out = json.dumps(json_data, indent=4)
+    create_or_update_json_entry(rocrate, key_path, doi)
+    key_path = "@graph.model_inputs.identifier"
+    create_or_update_json_entry(rocrate, key_path, doi)
+    key_path = "@graph.model_outputs.identifier"
+    create_or_update_json_entry(rocrate, key_path, doi)
+    citation_str = format_citation(rocrate)
+    key_path = "@graph../.creditText"
+    create_or_update_json_entry(rocrate, key_path, citation_str)
+
+    #save the updated crate
+    metadata_out = json.dumps(rocrate, indent=4)
     file_content = repo.get_contents(json_file_path)
-    commit_message = "Update ro-crate with DOI"
+    commit_message = "Update ro-crate with DOI etc."
     repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
 
     #add the creditText
     #json_data should be the updatated rocrate dictionary
-    citation_str = format_citation(json_data)
-    key_path = "@graph../.creditText"
-    json_data = create_or_update_json_entry(json_file_path, key_path, citation_str)
-    metadata_out = json.dumps(json_data, indent=4)
-    file_content = repo.get_contents(json_file_path)
-    commit_message = "Update ro-crate with DOI"
-    repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
+    #citation_str = format_citation(json_data)
+    #key_path = "@graph../.creditText"
+    #json_data = create_or_update_json_entry(json_file_path, key_path, citation_str)
+    #metadata_out = json.dumps(json_data, indent=4)
+    #file_content = repo.get_contents(json_file_path)
+    #commit_message = "Update ro-crate with DOI"
+    #repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
 
     #update the github cff file
     cff_text = ro_crate_to_cff(json_data)
@@ -61,23 +73,6 @@ if response != "No valid DOI found in the input string.":
     commit_message = "Update CITATION.cff"
     repo.update_file(cff_file_path, commit_message, cff_text, file_content.sha)
 
-
-    #add the DOI to the model_inputs entity
-    #key_path = "@graph.model_inputs.identifier"
-    #json_data = create_or_update_json_entry(json_file_path, key_path, doi)
-    #metadata_out = json.dumps(json_data, indent=4)
-    #file_content = repo.get_contents(json_file_path)
-    #commit_message = "Update ro-crate with DOI"
-    #repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
-
-
-    #add the DOI to the model_outputs entity
-    #key_path = "@graph.model_outputs.identifier"
-    #json_data = create_or_update_json_entry(json_file_path, key_path, doi)
-    #metadata_out = json.dumps(json_data, indent=4)
-    #file_content = repo.get_contents(json_file_path)
-    #commit_message = "Update ro-crate with DOI"
-    #repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
 
     #need to copy into the website materials folder
     web_json_file_path = "website_material/ro-crate-metadata.json"
