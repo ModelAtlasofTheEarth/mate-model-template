@@ -37,12 +37,30 @@ def format_citation(ro_crate):
     if not root_entity:
         return "Error: Root data entity not found."
 
-    # Extract essential data: title, DOI, publication year, publisher
+    # Extract essential data: title, DOI, publication year
     title = root_entity.get('name', 'No title available')
-    doi = root_entity.get('identifier', ['No DOI available'])[0]
+
+    # Handle the case where 'identifier' might be an empty string or empty list
+    identifier = root_entity.get('identifier')
+    if isinstance(identifier, list):
+        doi = identifier[0] if identifier and identifier[0] else 'No DOI available'
+    elif isinstance(identifier, str) and identifier:
+        doi = identifier
+    else:
+        doi = 'No DOI available'
+
     date_published = root_entity.get('datePublished', '')[:4]  # Extract the first four characters, which represent the year
-    publisher_entity = next((item for item in ro_crate['@graph'] if item['@id'] == root_entity.get('publisher', {}).get('@id')), None)
-    publisher_name = publisher_entity.get('name') if publisher_entity else "No publisher available"
+
+    # Extract publisher information, handling multiple publishers
+    publisher_ids = root_entity.get('publisher', [])
+    if not isinstance(publisher_ids, list):
+        publisher_ids = [publisher_ids]
+    publishers = []
+    for publisher_id in publisher_ids:
+        publisher_entity = next((item for item in ro_crate['@graph'] if item['@id'] == publisher_id['@id']), None)
+        if publisher_entity:
+            publishers.append(publisher_entity.get('name', 'No publisher available'))
+    publisher_names = ', '.join(publishers) if publishers else "No publisher available"
 
     # Extract and format author names
     authors = root_entity.get('creator', [])
@@ -61,8 +79,9 @@ def format_citation(ro_crate):
         authors_formatted = ''.join(author_names)
 
     # Create formatted citation string
-    citation = f"{authors_formatted} ({date_published}). {title} [Data set]. {publisher_name}. https://doi.org/{doi.split('/')[-1]}"
+    citation = f"{authors_formatted} ({date_published}). {title} [Data set]. {publisher_names}. https://doi.org/{doi.split('/')[-1]}"
     return citation
+
 
 
 
