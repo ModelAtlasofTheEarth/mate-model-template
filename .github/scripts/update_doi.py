@@ -31,12 +31,10 @@ response = extract_doi_parts(doi)
 if response != "No valid DOI found in the input string.":
     # Insert DOI into metadata
 
-    # JSON
+    # Read the RO-Crate  (JSON file)
     json_file_path = "ro-crate-metadata.json"
-
-    # Read the JSON file
-    with open(file_path, 'r') as file:
-            rocrate = json.load(json_file_path)
+    with open(json_file_path, 'r') as file:
+            rocrate = json.load(file)
 
     #add the DOI and any other chanages to the to the ro-crate
 
@@ -67,7 +65,7 @@ if response != "No valid DOI found in the input string.":
     #repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
 
     #update the github cff file
-    cff_text = ro_crate_to_cff(json_data)
+    cff_text = ro_crate_to_cff(rocrate)
     cff_file_path = "CITATION.cff"
     file_content = repo.get_contents(cff_file_path)
     commit_message = "Update CITATION.cff"

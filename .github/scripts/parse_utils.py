@@ -95,13 +95,14 @@ def ro_crate_to_cff(ro_crate):
     # Construct the CFF object
     cff_dict = {
         'cff-version': '1.2.0',
-        'message': 'If you use this software, please cite it as below.',
+        'message': 'If you use this model, please cite it as below.',
         'authors': author_list,
         'title': title,
         'version': version,
         'doi': doi,  # Assuming DOI is a complete URL, extract just the number
         'date-released': date_released,
-        'url': url
+        'url': url,
+        'type': dataset
     }
 
     # Convert dict to YAML format
