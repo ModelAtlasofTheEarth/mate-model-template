@@ -50,12 +50,15 @@ def create_or_update_json_entry(rocrate, keys_path, new_value):
     # Update the value at the final key
     if last_key in structure:
         if isinstance(structure[last_key], list):
-            structure[last_key].insert(0, new_value)
+            # Prepend only if the new value is not already in the list
+            if new_value not in structure[last_key]:
+                structure[last_key].insert(0, new_value)
         else:
+            # Convert existing non-list value to a list if needed
             structure[last_key] = [new_value, structure[last_key]]
     else:
+        # If the key doesn't exist, create a new list with the new value
         structure[last_key] = [new_value]
-
 
 
 def navigate_and_assign(source, path, value):
