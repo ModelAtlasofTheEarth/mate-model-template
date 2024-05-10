@@ -1,4 +1,5 @@
 import re
+import yaml
 
 
 def extract_doi_parts(doi_string):
@@ -62,3 +63,47 @@ def format_citation(ro_crate):
     # Create formatted citation string
     citation = f"{authors_formatted} ({date_published}). {title} [Data set]. {publisher_name}. https://doi.org/{doi.split('/')[-1]}"
     return citation
+
+
+
+
+def ro_crate_to_cff(ro_crate):
+    # Find the root entity
+    root_entity = next((item for item in ro_crate['@graph'] if item['@id'] == './'), None)
+    if not root_entity:
+        return "Error: Root data entity not found."
+
+    # Extract necessary fields
+    title = root_entity.get('name', 'No title available')
+    version = root_entity.get('version', '1.0')
+    doi = root_entity.get('identifier', ['No DOI available'])[0]
+    date_released = root_entity.get('datePublished', '').split('T')[0]
+    url = root_entity.get('url', 'No URL provided')
+
+    # Extract authors
+    authors = root_entity.get('creator', [])
+    author_list = []
+    for author_id in authors:
+        author_entity = next((item for item in ro_crate['@graph'] if item['@id'] == author_id['@id']), None)
+        if author_entity:
+            author_list.append({
+                'family-names': author_entity.get('familyName', ''),
+                'given-names': author_entity.get('givenName', ''),
+                'orcid': author_id['@id']
+            })
+
+    # Construct the CFF object
+    cff_dict = {
+        'cff-version': '1.2.0',
+        'message': 'If you use this software, please cite it as below.',
+        'authors': author_list,
+        'title': title,
+        'version': version,
+        'doi': doi,  # Assuming DOI is a complete URL, extract just the number
+        'date-released': date_released,
+        'url': url
+    }
+
+    # Convert dict to YAML format
+    cff_yaml = yaml.dump(cff_dict, sort_keys=False, default_flow_style=False)
+    return cff_yaml

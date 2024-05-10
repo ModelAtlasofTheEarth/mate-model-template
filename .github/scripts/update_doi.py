@@ -54,6 +54,13 @@ if response != "No valid DOI found in the input string.":
     commit_message = "Update ro-crate with DOI"
     repo.update_file(json_file_path, commit_message, metadata_out, file_content.sha)
 
+    #update the github cff file
+    cff_text = ro_crate_to_cff(json_data)
+    cff_file_path = "CITATION.cff"
+    file_content = repo.get_contents(cff_file_path)
+    commit_message = "Update CITATION.cff"
+    repo.update_file(cff_file_path, commit_message, cff_text, file_content.sha)
+
 
     #add the DOI to the model_inputs entity
     #key_path = "@graph.model_inputs.identifier"
