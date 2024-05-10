@@ -13,7 +13,7 @@ repo = g.get_repo(f"{repo_owner}/{repo_name}")
 
 # Check if the branch name already exists
 try:
-    repo.get_git_ref(f"heads/{branch_name}")
+    assert repo.get_git_ref(f"heads/{branch_name}").ref is not None
     print("Branch already exists")
 
 # Create new branch if it doesn't
