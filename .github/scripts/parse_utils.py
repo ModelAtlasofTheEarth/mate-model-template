@@ -121,7 +121,7 @@ def ro_crate_to_cff(ro_crate):
         'doi': doi,  # Assuming DOI is a complete URL, extract just the number
         'date-released': date_released,
         'url': url,
-        'type': dataset
+        'type': 'dataset'
     }
 
     # Convert dict to YAML format
