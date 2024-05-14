@@ -8,7 +8,7 @@ on:
 
 jobs:
     find-repos:
-        if: ${{ github.event.repository.name == 'mate_model_template' }}
+        if: ${{ github.event.repository.name == 'mate-model-template' }}
         runs-on: ubuntu-latest
         outputs:
             repo_matrix: ${{ steps.found-repos.outputs.repos }}
@@ -66,7 +66,7 @@ jobs:
                 private-key: ${{ secrets.APP_PRIVATE_KEY }}
                 owner: ${{ github.repository_owner }}
                 repositories: ${{ matrix.repo }}
-    
+
             - name: create branch
               env:
                 GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -75,7 +75,7 @@ jobs:
                 BRANCH_NAME: 'template-update'
               run: |
                 python3 .github/scripts/create_branch.py
-    
+
             - name: copy files to repo
               env:
                 GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -99,4 +99,4 @@ jobs:
                 HEAD_BRANCH: 'template-update'
                 BASE_BRANCH: 'main'
               run: |
-                python3 .github/scripts/pull_request.py                
+                python3 .github/scripts/pull_request.py
