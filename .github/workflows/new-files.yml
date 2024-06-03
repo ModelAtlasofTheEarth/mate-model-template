@@ -4,16 +4,16 @@ on:
         branches:
             - 'main'
         paths:
-            - 'website_material/**'
+            - '.website_material/**'
 
 jobs:
     # Copy files to website repo
     copy-files:
         runs-on: ubuntu-latest
-        steps:  
+        steps:
           - name: Checkout
             uses: actions/checkout@v4
-            
+
           - name: setup python
             uses: actions/setup-python@v5
             with:
@@ -39,7 +39,7 @@ jobs:
               private-key: ${{ secrets.APP_PRIVATE_KEY }}
               owner: ${{ github.repository_owner }}
               repositories: 'website'
-    
+
           - name: create branch
             if: ${{ steps.check-published.outputs.published == 'True' }}
             env:
@@ -49,15 +49,15 @@ jobs:
               BRANCH_NAME: ${{ github.event.repository.name }}
             run: |
               python3 .github/scripts/create_branch.py
-    
-    
+
+
           - name: copy files to website repo
             if: ${{ steps.check-published.outputs.published == 'True' }}
             env:
               GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
               SOURCE_REPO_OWNER: ${{ github.repository_owner }}
               SOURCE_REPO_NAME: ${{ github.event.repository.name }}
-              SOURCE_PATH: 'website_material'
+              SOURCE_PATH: '.website_material'
               TARGET_REPO_OWNER: ${{ github.repository_owner }}
               TARGET_REPO_NAME: 'website'
               TARGET_REPO_BRANCH: ${{ github.event.repository.name }}

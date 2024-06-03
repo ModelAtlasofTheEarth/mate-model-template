@@ -73,7 +73,7 @@ if response != "No valid DOI found in the input string.":
 
 
     #need to copy into the website materials folder
-    web_json_file_path = "website_material/ro-crate-metadata.json"
+    web_json_file_path = ".website_material/ro-crate-metadata.json"
     file_content = repo.get_contents(web_json_file_path)
     commit_message = "Update Website ro-crate with DOI"
     repo.update_file(web_json_file_path, commit_message, metadata_out, file_content.sha)
@@ -92,7 +92,7 @@ if response != "No valid DOI found in the input string.":
     yaml.indent(mapping=2, sequence=4, offset=2)
 
     # Read existing file
-    yaml_file_path = "website_material/index.md"
+    yaml_file_path = ".website_material/index.md"
     web_yaml_dict = read_yaml_with_header(yaml_file_path)
 
     # Path to key to update
