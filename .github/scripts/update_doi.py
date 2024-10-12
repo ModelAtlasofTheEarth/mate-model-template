@@ -79,7 +79,7 @@ if response != "No valid DOI found in the input string.":
     repo.update_file(web_json_file_path, commit_message, metadata_out, file_content.sha)
 
     #update CSV
-    csv_file_path = 'metadata_trail/nci_iso.csv'
+    csv_file_path = '.metadata_trail/nci_iso.csv'
     field = 'DOI (NCI Internal Field)'
     updated_csv_content = update_csv_content(csv_file_path, field, doi)
     file_content = repo.get_contents(csv_file_path)
