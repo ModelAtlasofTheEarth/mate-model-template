@@ -64,6 +64,9 @@ def format_citation(ro_crate):
 
     # Extract and format author names
     authors = root_entity.get('creator', [])
+    # If 'authors' is a dictionary (single author), convert it to a list for uniform handling
+    if isinstance(authors, dict):
+        authors = [authors
     author_names = []
     for author_id in authors:
         author_entity = next((item for item in ro_crate['@graph'] if item['@id'] == author_id['@id']), None)
