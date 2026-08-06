@@ -41,13 +41,17 @@ if response != "No valid DOI found in the input string.":
 
     key_path = "@graph../.identifier"
     create_or_update_json_entry(rocrate, key_path, doi)
-    key_path = "@graph.model_inputs.identifier"
-    create_or_update_json_entry(rocrate, key_path, doi)
-    key_path = "@graph.model_outputs.identifier"
-    create_or_update_json_entry(rocrate, key_path, doi)
     citation_str = format_citation(rocrate)
     key_path = "@graph../.creditText"
     create_or_update_json_entry(rocrate, key_path, citation_str)
+
+    #attach the DOI to the model input/output data entities (best-effort)
+    for entity_key in ("model_code_inputs", "model_output_data"):
+        key_path = f"@graph.{entity_key}.identifier"
+        try:
+            create_or_update_json_entry(rocrate, key_path, doi)
+        except KeyError as e:
+            print(f"Warning: {e}")
 
     #save the updated crate
     metadata_out = json.dumps(rocrate, indent=4)
