@@ -11,6 +11,7 @@ from file_utils import *
 token = os.environ.get("GITHUB_TOKEN")
 repo_name = os.environ.get("REPO_NAME")
 issue_number = int(os.environ.get("ISSUE_NUMBER"))
+update_website_material = os.environ.get("UPDATE_WEBSITE_MATERIAL", "True").lower() in ("true", "1", "yes")
 
 # Get issue
 auth = Auth.Token(token)
@@ -73,10 +74,11 @@ if response != "No valid DOI found in the input string.":
 
 
     #need to copy into the website materials folder
-    web_json_file_path = ".website_material/ro-crate-metadata.json"
-    file_content = repo.get_contents(web_json_file_path)
-    commit_message = "Update Website ro-crate with DOI"
-    repo.update_file(web_json_file_path, commit_message, metadata_out, file_content.sha)
+    if update_website_material:
+        web_json_file_path = ".website_material/ro-crate-metadata.json"
+        file_content = repo.get_contents(web_json_file_path)
+        commit_message = "Update Website ro-crate with DOI"
+        repo.update_file(web_json_file_path, commit_message, metadata_out, file_content.sha)
 
     #update CSV
     csv_file_path = '.metadata_trail/nci_iso.csv'
