@@ -4,6 +4,40 @@ import csv
 import os
 from io import StringIO
 
+def _is_root_entity(item):
+    """Return True if the entity is the RO-Crate root dataset."""
+    entity_id = item.get("@id")
+    if entity_id == "./":
+        return True
+    if not isinstance(entity_id, str) or not entity_id.endswith("/"):
+        return False
+    types = item.get("@type")
+    if isinstance(types, str):
+        types = [types]
+    return "Dataset" in (types or [])
+
+
+def _find_entity(graph, key):
+    """Find an entity in an RO-Crate @graph list by its @id.
+
+    Matches on the full @id, or on the last path segment of the @id
+    (e.g. 'model_code_inputs' matches 'http://example.org/base/model_code_inputs').
+    The root token './' matches the root dataset entity (id './' or a Dataset
+    whose id ends in '/').
+    """
+    for item in graph:
+        entity_id = item.get("@id")
+        if entity_id == key:
+            return item
+        if key == "./" and _is_root_entity(item):
+            return item
+        if isinstance(entity_id, str) and (
+            entity_id.endswith("/" + key) or entity_id.endswith("#" + key)
+        ):
+            return item
+    return None
+
+
 def create_or_update_json_entry(rocrate, keys_path, new_value):
     """
     Create or update a nested JSON entry in a ro-crate structure.
@@ -12,6 +46,9 @@ def create_or_update_json_entry(rocrate, keys_path, new_value):
         rocrate (dict): The main ro-crate dictionary.
         keys_path (str): Dot-separated path to the key that needs updating.
         new_value (any): New value to be inserted or updated.
+
+    Raises:
+        KeyError: If an intermediate key cannot be resolved in the structure.
     """
     # Split the keys path into individual components
     keys = keys_path.split('.')
@@ -31,18 +68,14 @@ def create_or_update_json_entry(rocrate, keys_path, new_value):
 
         if isinstance(structure, list):
             # Find the item with matching '@id' key
-            for item in structure:
-                if item.get("@id") == key:
-                    structure = item
-                    break
-            else:
-                print(f"Key '{key}' not found.")
-                return
+            item = _find_entity(structure, key)
+            if item is None:
+                raise KeyError(f"Key '{key}' not found in @graph.")
+            structure = item
         elif key in structure:
             structure = structure[key]
         else:
-            print(f"Key '{key}' not found.")
-            return
+            raise KeyError(f"Key '{key}' not found.")
 
     # The final key where the new value should be placed
     last_key = keys[-1]

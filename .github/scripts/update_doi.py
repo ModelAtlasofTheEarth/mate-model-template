@@ -11,6 +11,7 @@ from file_utils import *
 token = os.environ.get("GITHUB_TOKEN")
 repo_name = os.environ.get("REPO_NAME")
 issue_number = int(os.environ.get("ISSUE_NUMBER"))
+update_website_material = os.environ.get("UPDATE_WEBSITE_MATERIAL", "True").lower() in ("true", "1", "yes")
 
 # Get issue
 auth = Auth.Token(token)
@@ -40,13 +41,17 @@ if response != "No valid DOI found in the input string.":
 
     key_path = "@graph../.identifier"
     create_or_update_json_entry(rocrate, key_path, doi)
-    key_path = "@graph.model_inputs.identifier"
-    create_or_update_json_entry(rocrate, key_path, doi)
-    key_path = "@graph.model_outputs.identifier"
-    create_or_update_json_entry(rocrate, key_path, doi)
     citation_str = format_citation(rocrate)
     key_path = "@graph../.creditText"
     create_or_update_json_entry(rocrate, key_path, citation_str)
+
+    #attach the DOI to the model input/output data entities (best-effort)
+    for entity_key in ("model_code_inputs", "model_output_data"):
+        key_path = f"@graph.{entity_key}.identifier"
+        try:
+            create_or_update_json_entry(rocrate, key_path, doi)
+        except KeyError as e:
+            print(f"Warning: {e}")
 
     #save the updated crate
     metadata_out = json.dumps(rocrate, indent=4)
@@ -73,10 +78,11 @@ if response != "No valid DOI found in the input string.":
 
 
     #need to copy into the website materials folder
-    web_json_file_path = ".website_material/ro-crate-metadata.json"
-    file_content = repo.get_contents(web_json_file_path)
-    commit_message = "Update Website ro-crate with DOI"
-    repo.update_file(web_json_file_path, commit_message, metadata_out, file_content.sha)
+    if update_website_material:
+        web_json_file_path = ".website_material/ro-crate-metadata.json"
+        file_content = repo.get_contents(web_json_file_path)
+        commit_message = "Update Website ro-crate with DOI"
+        repo.update_file(web_json_file_path, commit_message, metadata_out, file_content.sha)
 
     #update CSV
     csv_file_path = '.metadata_trail/nci_iso.csv'

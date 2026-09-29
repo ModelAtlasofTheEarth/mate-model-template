@@ -2,6 +2,24 @@ import re
 import yaml
 
 
+def _find_root_entity(ro_crate):
+    # Find the root entity (main dataset) of the crate.
+    # Prefer the standard './' id, falling back to a Dataset whose id ends in '/'
+    # (e.g. 'http://example.org/base/'), since the flattened crates do not use './'.
+    for item in ro_crate['@graph']:
+        if item.get('@id') == './':
+            return item
+    for item in ro_crate['@graph']:
+        entity_id = item.get('@id')
+        if isinstance(entity_id, str) and entity_id.endswith('/'):
+            types = item.get('@type')
+            if isinstance(types, str):
+                types = [types]
+            if 'Dataset' in (types or []):
+                return item
+    return None
+
+
 def extract_doi_parts(doi_string):
     # Regular expression to match a DOI within a string or URL
     # It looks for a string starting with '10.' followed by any non-whitespace characters
@@ -33,7 +51,7 @@ def extract_doi_parts(doi_string):
 
 def format_citation(ro_crate):
     # Find the root entity (main dataset)
-    root_entity = next((item for item in ro_crate['@graph'] if item['@id'] == './'), None)
+    root_entity = _find_root_entity(ro_crate)
     if not root_entity:
         return "Error: Root data entity not found."
 
@@ -91,14 +109,20 @@ def format_citation(ro_crate):
 
 def ro_crate_to_cff(ro_crate):
     # Find the root entity
-    root_entity = next((item for item in ro_crate['@graph'] if item['@id'] == './'), None)
+    root_entity = _find_root_entity(ro_crate)
     if not root_entity:
         return "Error: Root data entity not found."
 
     # Extract necessary fields
     title = root_entity.get('name', 'No title available')
     version = root_entity.get('version', '1.0')
-    doi = root_entity.get('identifier', ['No DOI available'])[0]
+    identifier = root_entity.get('identifier')
+    if isinstance(identifier, list):
+        doi = identifier[0] if identifier and identifier[0] else 'No DOI available'
+    elif isinstance(identifier, str) and identifier:
+        doi = identifier
+    else:
+        doi = 'No DOI available'
     date_released = root_entity.get('datePublished', '').split('T')[0]
     url = root_entity.get('url', 'No URL provided')
 
