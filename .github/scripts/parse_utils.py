@@ -127,11 +127,9 @@ def format_citation(crate):
     else:
         authors_str = "".join(author_names)
 
-    # Use just the suffix portion of the DOI for the URL
-    doi_suffix = doi.split("/")[-1] if doi != "No DOI available" else doi
     citation = (
         f"{authors_str} ({date_published}). {title} [Data set]. "
-        f"{publisher_str}. https://doi.org/{doi_suffix}"
+        f"{publisher_str}. {doi}"
     )
     return citation
 
@@ -159,6 +157,9 @@ def ro_crate_to_cff(crate):
         doi = identifier[0] if identifier else "No DOI available"
     else:
         doi = identifier or "No DOI available"
+
+    if isinstance(doi, str) and doi.startswith("10."):
+        doi = f"https://doi.org/{doi}"
 
     date_released = (root.get("datePublished") or "").split("T")[0]
     url = root.get("url") or "No URL provided"

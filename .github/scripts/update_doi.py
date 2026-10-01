@@ -27,6 +27,7 @@ doi = data["-> doi"].strip()
 # Reserved DOIs cannot be verified via HTTP so we only validate the format.
 response = extract_doi_parts(doi)
 if response != "No valid DOI found in the input string.":
+    canonical_doi = f"https://doi.org/{response}"
 
     # --- Load RO-Crate from repo ---
     json_file_path = "ro-crate-metadata.json"
@@ -39,12 +40,12 @@ if response != "No valid DOI found in the input string.":
 
     # --- Update identifiers ---
     root = crate.root_dataset
-    root.append_to("identifier", doi, compact=True)
+    root["identifier"] = [canonical_doi]
 
-    for entity_id in ("model_inputs", "model_outputs", "model_code_inputs", "model_output_data"):
+    for entity_id in ("model_outputs", "model_output_data"):
         entity = crate.dereference(entity_id)
         if entity is not None:
-            entity.append_to("identifier", doi, compact=True)
+            entity["identifier"] = [canonical_doi]
 
     # --- Update creditText ---
     citation_str = format_citation(crate)
