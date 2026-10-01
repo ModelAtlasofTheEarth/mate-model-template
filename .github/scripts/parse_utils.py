@@ -3,6 +3,29 @@ import yaml
 from rocrate.rocrate import ROCrate
 
 
+def normalize_rocrate_dict(rocrate_dict):
+    """
+    Normalize RO-Crate dictionary to strip accidental example.org base URIs.
+    """
+
+    def fix_value(value):
+        if isinstance(value, str):
+            if value in ("http://example.org/base/", "http://example.org/base"):
+                return "./"
+            if value.startswith("http://example.org/base/"):
+                return value[len("http://example.org/base/"):]
+            return value
+        if isinstance(value, list):
+            return [fix_value(item) for item in value]
+        if isinstance(value, dict):
+            return {key: fix_value(val) for key, val in value.items()}
+        return value
+
+    if any("example.org/base" in entity.get("@id", "") for entity in rocrate_dict.get("@graph", [])):
+        return fix_value(rocrate_dict)
+    return rocrate_dict
+
+
 def extract_doi_parts(doi_string):
     """
     Extract and clean a DOI from arbitrary text (plain DOI string, full URL, etc.).
@@ -63,21 +86,39 @@ def format_citation(crate):
         publisher_refs = [publisher_refs]
     publisher_names = []
     for ref in publisher_refs:
-        entity = crate.dereference(ref["@id"]) if isinstance(ref, dict) else crate.dereference(ref.id)
+        if isinstance(ref, dict):
+            ref_id = ref.get("@id")
+        elif hasattr(ref, "id"):
+            ref_id = ref.id
+        elif isinstance(ref, str):
+            ref_id = ref
+        else:
+            ref_id = None
+        entity = crate.dereference(ref_id) if ref_id else None
         if entity:
             publisher_names.append(entity.get("name") or "No publisher available")
     publisher_str = ", ".join(publisher_names) if publisher_names else "No publisher available"
 
     # Resolve and format author names
     creator_refs = root.get("creator") or []
-    if isinstance(creator_refs, dict):
+    if not isinstance(creator_refs, list):
         creator_refs = [creator_refs]
     author_names = []
     for ref in creator_refs:
-        entity = crate.dereference(ref["@id"]) if isinstance(ref, dict) else crate.dereference(ref.id)
+        if isinstance(ref, dict):
+            ref_id = ref.get("@id")
+        elif hasattr(ref, "id"):
+            ref_id = ref.id
+        elif isinstance(ref, str):
+            ref_id = ref
+        else:
+            ref_id = None
+        entity = crate.dereference(ref_id) if ref_id else None
         if entity:
             surname = entity.get("familyName") or ""
             given = entity.get("givenName") or ""
+            if isinstance(given, list):
+                given = given[0] if given else ""
             initial = given[0] if given else ""
             author_names.append(f"{surname}, {initial}.")
 
@@ -124,15 +165,19 @@ def ro_crate_to_cff(crate):
 
     # Resolve authors
     creator_refs = root.get("creator") or []
-    if isinstance(creator_refs, dict):
+    if not isinstance(creator_refs, list):
         creator_refs = [creator_refs]
 
     author_list = []
     for ref in creator_refs:
         if isinstance(ref, dict):
             author_id = ref.get("@id")
-        else:
+        elif hasattr(ref, "id"):
             author_id = ref.id
+        elif isinstance(ref, str):
+            author_id = ref
+        else:
+            author_id = None
 
         if author_id is None:
             print(f"No '@id' found for author reference: {ref}")
@@ -140,9 +185,12 @@ def ro_crate_to_cff(crate):
 
         entity = crate.dereference(author_id)
         if entity:
+            given = entity.get("givenName") or ""
+            if isinstance(given, list):
+                given = " ".join(given)
             author_list.append({
                 "family-names": entity.get("familyName") or "",
-                "given-names": entity.get("givenName") or "",
+                "given-names": given,
                 "orcid": author_id,
             })
         else:

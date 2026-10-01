@@ -3,7 +3,7 @@ import re
 import json
 from github import Github, Auth
 from rocrate.rocrate import ROCrate
-from parse_utils import extract_doi_parts, format_citation, ro_crate_to_cff
+from parse_utils import extract_doi_parts, format_citation, ro_crate_to_cff, normalize_rocrate_dict
 from file_utils import update_csv_content
 
 # Environment variables
@@ -32,6 +32,7 @@ if response != "No valid DOI found in the input string.":
     json_file_path = "ro-crate-metadata.json"
     file_content = repo.get_contents(json_file_path)
     rocrate_dict = json.loads(file_content.decoded_content.decode("utf-8"))
+    rocrate_dict = normalize_rocrate_dict(rocrate_dict)
 
     # Load into rocrate library (detached crate from raw dict)
     crate = ROCrate(rocrate_dict)
@@ -40,7 +41,7 @@ if response != "No valid DOI found in the input string.":
     root = crate.root_dataset
     root.append_to("identifier", doi, compact=True)
 
-    for entity_id in ("model_inputs", "model_outputs"):
+    for entity_id in ("model_inputs", "model_outputs", "model_code_inputs", "model_output_data"):
         entity = crate.dereference(entity_id)
         if entity is not None:
             entity.append_to("identifier", doi, compact=True)
