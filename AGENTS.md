@@ -2,7 +2,7 @@
 
 ## What this repo is
 
-This is the **M@TE (Model, Topography, Tectonics & Earth dynamics) model template**. It is a GitHub template repository — individual model repos are created from it, not forked. Automation runs entirely through GitHub Actions triggered by issues and labels, not via local developer commands.
+This is the **M@TE (Model, Topography, Tectonics & Earth dynamics) Template repository**. Individual model repos are created from it, not forked. Automation runs entirely through GitHub Actions triggered by issues and labels, not via local developer commands.
 
 ## Repository structure
 
